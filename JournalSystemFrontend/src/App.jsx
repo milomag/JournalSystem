@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Patients from "./pages/Patients";
 
 function App(){
-    const [patient, setPatient] = useState(null);
+    return(
+        <BrowserRouter>
+            <Navbar />
 
-    useEffect(()=>{
-        fetch("/api/patients/1")
-            .then(response=>response.json())
-            .then(data=>setPatient(data));
-    }, []);
-
-    return <pre>{JSON.stringify(patient, null, 2)}</pre>;
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/patients" element={<Patients />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;

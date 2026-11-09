@@ -25,4 +25,10 @@ public class PatientController{
 
         return ResponseEntity.ok(patient.get());
     }
+
+    @PostMapping
+    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient){
+        Patient createdPatient = patientService.createPatient(patient);
+        return ResponseEntity.ok(createdPatient);
+    }
 }

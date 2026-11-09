@@ -1,6 +1,6 @@
 package com.journalsystem.backend.config;
 
-import com.journalsystem.backend.repository.PatientRepository;
+import com.journalsystem.backend.repository.IPatientRepository;
 import com.journalsystem.backend.entity.Patient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -8,15 +8,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataInitializer implements CommandLineRunner{
 
-    private final PatientRepository patientRepository;
+    private final IPatientRepository iPatientRepository;
 
-    public DataInitializer(PatientRepository patientRepository){
-        this.patientRepository = patientRepository;
+    public DataInitializer(IPatientRepository iPatientRepository){
+        this.iPatientRepository = iPatientRepository;
     }
 
     @Override
     public void run(String... args){
-        if(patientRepository.count() == 0){
+        if(iPatientRepository.count() == 0){
             Patient patient = new Patient(
                     "test@example.com",
                     "0701234567",
@@ -24,7 +24,7 @@ public class DataInitializer implements CommandLineRunner{
                     java.time.LocalDate.of(2000, 5, 15)
             );
 
-            patientRepository.save(patient);
+            iPatientRepository.save(patient);
         }
     }
 }
