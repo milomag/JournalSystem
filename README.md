@@ -1,4 +1,4 @@
-## Instalation Guide
+## Instalation Guide(obsolet)
 - Download node.js LTS
 - run comands:
 
