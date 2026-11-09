@@ -1,25 +1,15 @@
-
-import {useEffect, useState} from 'react'
+import { useEffect, useState } from "react";
 
 function App(){
-  const [message, setMessage] = useState("Loading...")
+    const [patient, setPatient] = useState(null);
 
-  useEffect(()=>{
-      fetch("/api/hello")
-        .then(response => response.text())
-        .then(data => setMessage(data))
-        .catch(error => {
-          console.error(error)
-          setMessage("Could not connect to backend")
-        })
-  }, [])
+    useEffect(()=>{
+        fetch("/api/patients/1")
+            .then(response=>response.json())
+            .then(data=>setPatient(data));
+    }, []);
 
-  return(
-      <div>
-        <h1>JournalSystem</h1>
-        <p>Backend response: {message}</p>
-      </div>
-  )
+    return <pre>{JSON.stringify(patient, null, 2)}</pre>;
 }
 
-export default App
+export default App;
