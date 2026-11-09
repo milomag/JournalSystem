@@ -22,3 +22,8 @@ nu ska vi fixa db med docker
 - React-frontend igång på port 5173.
 - Spring Boot-backend igång på port 8080.
 - MySQL-databas igång i Docker på port 3307.
+
+## Docker Kommandon
+- docker compose up:	Startar containrarna som redan finns.
+- docker compose up --build:	Bygger om images och startar containrarna.
+- docker compose down:	Stoppar och tar bort containrarna.

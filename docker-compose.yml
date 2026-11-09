@@ -1,0 +1,40 @@
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: journalsystem-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: journalsystem
+    ports:
+      - "3307:3306"
+    volumes:
+      - journalsystem-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./JournalSystemBackend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/journalsystem
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./JournalSystemFrontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  journalsystem-data:
+    external: true
