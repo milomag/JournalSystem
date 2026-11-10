@@ -31,4 +31,15 @@ public class PatientController{
         Patient createdPatient = patientService.createPatient(patient);
         return ResponseEntity.ok(createdPatient);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Patient> getPatientByUserId(@PathVariable Long userId){
+        var patient = patientService.getPatientByUserId(userId);
+
+        if(patient.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(patient.get());
+    }
 }

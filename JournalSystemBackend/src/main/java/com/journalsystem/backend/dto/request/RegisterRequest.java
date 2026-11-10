@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 public class RegisterRequest{
 
     @NotBlank(message = "Email is required.")
@@ -19,21 +21,43 @@ public class RegisterRequest{
     @NotNull
     private Role role;
 
-    public RegisterRequest(String email, String password, Role role){
+    private String fullName;
+
+    private LocalDate dateOfBirth;
+
+    private String phoneNumber;
+
+    public RegisterRequest(String email, String password, Role role,
+                           String fullName, LocalDate dateOfBirth, String phoneNumber){
         this.email = email;
         this.password = password;
         this.role = role;
+        this.fullName = fullName;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return password;
     }
 
-    public Role getRole(){
+    public Role getRole() {
         return role;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 }

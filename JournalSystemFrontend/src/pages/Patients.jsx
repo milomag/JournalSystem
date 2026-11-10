@@ -1,25 +1,25 @@
+import { useState, useEffect } from "react";
 
-import { useState } from "react";
-
-function Patients(){
+function Patients({ user }){
     const [patientId, setPatientId] = useState("");
     const [patient, setPatient] = useState(null);
     const [error, setError] = useState("");
 
-    async function searchPatient(){
+    const isPatient = user.role === "PATIENT";
+    const isStaff = user.role === "STAFF";
+    const isDoctor = user.role === "DOCTOR";
+
+    async function fetchPatient(url){
         setPatient(null);
         setError("");
 
-        if(!patientId){
-            setError("Please enter a patient ID.");
-            return;
-        }
-
         try{
-            const response = await fetch(`/api/patients/${patientId}`);
+            const response = await fetch(url);
 
             if(!response.ok){
-                setError("Patient not found.");
+                setError(response.status === 404
+                    ? "Patient not found."
+                    : "Could not retrieve patient information.");
                 return;
             }
 
@@ -31,28 +31,53 @@ function Patients(){
         }
     }
 
+    useEffect(()=>{
+        if(isPatient){
+            fetchPatient(`/api/patients/user/${user.id}`);
+        }
+    }, [isPatient, user.id]);
+
+    async function searchPatient(){
+        if(!patientId){
+            setError("Please enter a patient ID.");
+            setPatient(null);
+            return;
+        }
+
+        fetchPatient(`/api/patients/${patientId}`);
+    }
+
     return(
         <div>
-            <h1>Find Patient</h1>
+            <h1>{isPatient ? "My Patient Information" : "Find Patient"}</h1>
 
-            <input
-                type="number"
-                placeholder="Enter patient ID"
-                value={patientId}
-                onChange={event=>setPatientId(event.target.value)}
-            />
+            {(isStaff || isDoctor) && (
+                <div>
+                    <input
+                        type="number"
+                        placeholder="Enter patient ID"
+                        value={patientId}
+                        onChange={event=>setPatientId(event.target.value)}
+                    />
 
-            <button onClick={searchPatient}>Search</button>
+                    <button onClick={searchPatient}>Search</button>
+                </div>
+            )}
 
             {error && <p>{error}</p>}
 
             {patient && (
                 <div>
                     <h2>{patient.fullName}</h2>
-                    <p>ID: {patient.id}</p>
-                    <p>Email: {patient.email}</p>
-                    <p>Phone: {patient.phoneNumber}</p>
-                    <p>Date of birth: {patient.dateOfBirth}</p>
+
+                    {isDoctor || isPatient ? (
+                        <>
+                            <p>ID: {patient.id}</p>
+                            <p>Email: {patient.email}</p>
+                            <p>Phone: {patient.phoneNumber}</p>
+                            <p>Date of birth: {patient.dateOfBirth}</p>
+                        </>
+                    ) : null}
                 </div>
             )}
         </div>

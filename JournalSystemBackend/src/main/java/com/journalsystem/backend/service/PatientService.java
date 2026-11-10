@@ -22,4 +22,8 @@ public class PatientService{
     public Patient createPatient(Patient patient){
         return iPatientRepository.save(patient);
     }
+
+    public Optional<Patient> getPatientByUserId(Long userId) {
+        return iPatientRepository.findByUser_Id(userId);
+    }
 }

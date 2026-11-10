@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function Auth(){
+function Auth({setUser}){
     const [register, setRegister] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -8,6 +9,8 @@ function Auth(){
     const [message, setMessage] = useState("");
     const [fullName, setFullName] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const navigate = useNavigate();
 
     async function handleSubmit(event){
         event.preventDefault();
@@ -18,7 +21,9 @@ function Auth(){
             : "/api/users/login";
 
         const body = register
-            ? { email, password, role, fullName, dateOfBirth }
+            ? role === "PATIENT"
+                ? { email, password, role, fullName, dateOfBirth, phoneNumber }
+                : { email, password, role }
             : { email, password };
 
         try{
@@ -35,8 +40,16 @@ function Auth(){
                 return;
             }
 
+            if(register){
+                setMessage("Registration successful! You can now log in.");
+                setRegister(false);
+                setPassword("");
+                return;
+            }
+
             localStorage.setItem("user", JSON.stringify(data));
-            setMessage(register ? "Registration successful!" : "Login successful!");
+            setUser(data);
+            navigate("/");
         }
         catch(error){
             setMessage("Could not connect to the server.");
@@ -78,6 +91,14 @@ function Auth(){
                             type="date"
                             value={dateOfBirth}
                             onChange={e=>setDateOfBirth(e.target.value)}
+                            required
+                        />
+
+                        <input
+                            type="tel"
+                            placeholder="Phone number"
+                            value={phoneNumber}
+                            onChange={e=>setPhoneNumber(e.target.value)}
                             required
                         />
                     </>

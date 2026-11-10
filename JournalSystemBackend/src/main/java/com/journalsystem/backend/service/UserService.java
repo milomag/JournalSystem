@@ -3,13 +3,17 @@ package com.journalsystem.backend.service;
 import com.journalsystem.backend.exception.EmailAlreadyRegisteredException;
 import com.journalsystem.backend.exception.InvalidCredentialsException;
 import com.journalsystem.backend.repository.IUserRepository;
+import com.journalsystem.backend.repository.IPatientRepository;
 import com.journalsystem.backend.dto.request.LoginRequest;
 import com.journalsystem.backend.dto.request.RegisterRequest;
 import com.journalsystem.backend.dto.response.UserResponse;
 import com.journalsystem.backend.entity.User;
+import com.journalsystem.backend.entity.Patient;
+import com.journalsystem.backend.entity.Role;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -17,26 +21,52 @@ import java.util.Optional;
 public class UserService{
 
     private final IUserRepository userRepository;
+    private final PatientService patientService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(IUserRepository userRepository, PasswordEncoder passwordEncoder){
+    public UserService(IUserRepository userRepository,
+                       PatientService patientService,
+                       PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
+        this.patientService = patientService;
         this.passwordEncoder = passwordEncoder;
     }
 
+    @Transactional
     public UserResponse registerUser(RegisterRequest request){
         if(userRepository.existsByEmail(request.getEmail())){
             throw new EmailAlreadyRegisteredException();
+        }
+
+        if(request.getRole() == Role.PATIENT){
+            if(request.getFullName() == null || request.getFullName().isBlank()
+                    || request.getPhoneNumber() == null || request.getPhoneNumber().isBlank()
+                    || request.getDateOfBirth() == null){
+                throw new IllegalArgumentException("All patient information is required.");
+            }
         }
 
         User user = new User(
                 null,
                 request.getEmail(),
                 passwordEncoder.encode(request.getPassword()),
-                request.getRole()
+                request.getRole(),
+                null
         );
 
         User savedUser = userRepository.save(user);
+
+        if(request.getRole() == Role.PATIENT){
+            Patient patient = new Patient(
+                    savedUser,
+                    request.getEmail(),
+                    request.getPhoneNumber(),
+                    request.getFullName(),
+                    request.getDateOfBirth()
+            );
+
+            patientService.createPatient(patient);
+        }
 
         return toUserResponse(savedUser);
     }

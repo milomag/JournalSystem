@@ -1,5 +1,6 @@
 package com.journalsystem.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
@@ -20,9 +21,15 @@ public class Patient{
 
     private LocalDate dateOfBirth;
 
+    @JsonIgnore
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
+
     public Patient(){}
 
-    public Patient(String email, String phoneNumber, String fullName, LocalDate dateOfBirth){
+    public Patient(User user, String email, String phoneNumber, String fullName, LocalDate dateOfBirth){
+        this.user = user;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.fullName = fullName;
@@ -47,6 +54,10 @@ public class Patient{
 
     public LocalDate getDateOfBirth(){
         return dateOfBirth;
+    }
+
+    public User getUser(){
+        return user;
     }
 }
 
