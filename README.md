@@ -33,3 +33,4 @@ npm install react-router-dom (React Router allowes uss to navigate bettwen the p
 - docker compose down:	Stoppar och tar bort containrarna.
 - docker compose up --build -d: Bygger containrar och låter dom köra i bakgrunden
 - docker compose down: Stänger ner containrar
+- docker exec -it journalsystem-db mysql -u root -p: Få tillgång till mysql databasen

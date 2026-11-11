@@ -47,8 +47,10 @@ function Auth({setUser}){
                 return;
             }
 
-            localStorage.setItem("user", JSON.stringify(data));
-            setUser(data);
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+
+            setUser(data.user);
             navigate("/");
         }
         catch(error){

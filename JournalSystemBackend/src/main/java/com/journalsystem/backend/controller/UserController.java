@@ -4,6 +4,7 @@ import com.journalsystem.backend.dto.request.LoginRequest;
 import com.journalsystem.backend.dto.request.RegisterRequest;
 import com.journalsystem.backend.dto.response.UserResponse;
 import com.journalsystem.backend.service.UserService;
+import com.journalsystem.backend.dto.response.AuthResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +28,8 @@ public class UserController{
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> loginUser(@Valid @RequestBody LoginRequest request){
-        UserResponse response = userService.loginUser(request);
+    public ResponseEntity<AuthResponse> loginUser(@Valid @RequestBody LoginRequest request){
+        AuthResponse response = userService.loginUser(request);
 
         return ResponseEntity.ok(response);
     }

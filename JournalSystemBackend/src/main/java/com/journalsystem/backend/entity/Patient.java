@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import com.journalsystem.backend.dto.response.PatientResponse;
 
 @Entity
 @Table(name = "patients")
@@ -39,6 +40,16 @@ public class Patient extends User{
 
     public UserResponse toUserResponse() {
         return new UserResponse(id, email, Role.PATIENT);
+    }
+
+    public PatientResponse toPatientResponse(){
+        return new PatientResponse(
+                id,
+                email,
+                fullName,
+                dateOfBirth,
+                phoneNumber
+        );
     }
 }
 
