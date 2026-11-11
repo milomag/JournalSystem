@@ -34,12 +34,12 @@ public class PatientController{
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Patient> getPatientByUserId(@PathVariable Long userId){
-        var patient = patientService.getPatientByUserId(userId);
+        var patient = patientService.getPatientById(userId);
 
         if(patient.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(patient.get());
+        return ResponseEntity.ok(patient.get()); //does this return the entire patient because you should not return the password
     }
 }

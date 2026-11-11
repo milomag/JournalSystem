@@ -1,33 +1,28 @@
 package com.journalsystem.backend.entity;
 
+import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.*;
 
 @Entity
-public class User{
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
-    private String email;
+    @Column(unique = true)
+    protected String email;
 
-    private String password;
+    protected String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
-
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
-
-    public User() {
+    protected User() {
     }
 
-    public User(Long id, String email, String password, Role role, Patient patient) {
+    protected User(Long id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
-        this.role = role;
-        this.patient = patient;
     }
 
     public Long getId() {
@@ -42,15 +37,9 @@ public class User{
         return password;
     }
 
-    public Role getRole() {
-        return role;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public Patient getPatient(){
-        return patient;
-    }
+    public abstract UserResponse toUserResponse();
 }

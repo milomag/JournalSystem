@@ -23,7 +23,5 @@ public class PatientService{
         return iPatientRepository.save(patient);
     }
 
-    public Optional<Patient> getPatientByUserId(Long userId) {
-        return iPatientRepository.findByUser_Id(userId);
-    }
+    public boolean existsByEmail(String email) { return iPatientRepository.existsByEmail(email); }
 }

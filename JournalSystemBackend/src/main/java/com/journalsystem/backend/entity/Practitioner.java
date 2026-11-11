@@ -1,31 +1,19 @@
 package com.journalsystem.backend.entity;
 
+import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.*;
 
 @Entity
-public class Practitioner{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+public class Practitioner extends User{
 
     public Practitioner() {
     }
 
-    public Practitioner(Long id, User user) {
-        this.id = id;
-        this.user = user;
+    public Practitioner(Long id, String email, String password) {
+        super(id, email, password);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
+    public UserResponse toUserResponse() {
+        return new UserResponse(id, email, Role.DOCTOR);
     }
 }

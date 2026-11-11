@@ -1,18 +1,13 @@
 package com.journalsystem.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "patients")
-public class Patient{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String email;
+public class Patient extends User{
 
     private String phoneNumber;
 
@@ -21,27 +16,13 @@ public class Patient{
 
     private LocalDate dateOfBirth;
 
-    @JsonIgnore
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
-
     public Patient(){}
 
-    public Patient(User user, String email, String phoneNumber, String fullName, LocalDate dateOfBirth){
-        this.user = user;
-        this.email = email;
+    public Patient(Long id, String email, String password, String phoneNumber, String fullName, LocalDate dateOfBirth){
+        super(id, email, password);
         this.phoneNumber = phoneNumber;
         this.fullName = fullName;
         this.dateOfBirth = dateOfBirth;
-    }
-
-    public Long getId(){
-        return id;
-    }
-
-    public String getEmail(){
-        return email;
     }
 
     public String getPhoneNumber(){
@@ -56,8 +37,8 @@ public class Patient{
         return dateOfBirth;
     }
 
-    public User getUser(){
-        return user;
+    public UserResponse toUserResponse() {
+        return new UserResponse(id, email, Role.PATIENT);
     }
 }
 
