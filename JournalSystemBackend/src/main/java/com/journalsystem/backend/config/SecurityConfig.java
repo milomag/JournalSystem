@@ -40,6 +40,7 @@ public class SecurityConfig{
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/register", "/api/users/login").permitAll()
                         .anyRequest().authenticated()
                 )
