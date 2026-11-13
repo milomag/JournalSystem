@@ -10,13 +10,17 @@ function Patients({ user }){
     const isDoctor = user.role === "DOCTOR";
 
     async function fetchPatient(url){
-        setPatient(null);
-        setError("");
-
         try{
-            const response = await fetch(url);
+            const token = localStorage.getItem("token");
+
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
 
             if(!response.ok){
+                setPatient(null);
                 setError(response.status === 404
                     ? "Patient not found."
                     : "Could not retrieve patient information.");
@@ -25,17 +29,58 @@ function Patients({ user }){
 
             const data = await response.json();
             setPatient(data);
+            setError("");
         }
         catch(error){
+            setPatient(null);
             setError("Could not connect to the server.");
         }
     }
 
     useEffect(()=>{
-        if(isPatient){
-            fetchPatient(`/api/patients/user/${user.id}`);
+        if(!isPatient) return;
+
+        let ignore = false;
+
+        async function loadPatient(){
+            try{
+                const token = localStorage.getItem("token");
+
+                const response = await fetch("/api/patients/me", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if(!response.ok){
+                    if(ignore) return;
+
+                    setPatient(null);
+                    setError("Could not retrieve patient information.");
+                    return;
+                }
+
+                const data = await response.json();
+
+                if(ignore) return;
+
+                setPatient(data);
+                setError("");
+            }
+            catch(error){
+                if(ignore) return;
+
+                setPatient(null);
+                setError("Could not connect to the server.");
+            }
         }
-    }, [isPatient, user.id]);
+
+        loadPatient();
+
+        return ()=>{
+            ignore = true;
+        };
+    }, [isPatient]);
 
     async function searchPatient(){
         if(!patientId){
@@ -44,7 +89,11 @@ function Patients({ user }){
             return;
         }
 
-        fetchPatient(`/api/patients/${patientId}`);
+        const url = isStaff
+            ? `/api/patients/staff/${patientId}`
+            : `/api/patients/${patientId}`;
+
+        fetchPatient(url);
     }
 
     return(

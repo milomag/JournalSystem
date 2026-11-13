@@ -1,5 +1,6 @@
 package com.journalsystem.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.*;
 
@@ -33,6 +34,7 @@ public abstract class User{
         return email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }

@@ -1,8 +1,13 @@
+
 package com.journalsystem.backend.controller;
 
-import com.journalsystem.backend.entity.Patient;
+import com.journalsystem.backend.dto.response.PatientNameResponse;
+import com.journalsystem.backend.dto.response.PatientResponse;
+import com.journalsystem.backend.repository.IUserRepository;
 import com.journalsystem.backend.service.PatientService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,36 +15,59 @@ import org.springframework.web.bind.annotation.*;
 public class PatientController{
 
     private final PatientService patientService;
+    private final IUserRepository userRepository;
 
-    public PatientController(PatientService patientService){
+    public PatientController(
+            PatientService patientService,
+            IUserRepository userRepository){
         this.patientService = patientService;
+        this.userRepository = userRepository;
     }
 
+    // Doctors can search for any patient
+    @PreAuthorize("hasRole('DOCTOR')")
     @GetMapping("/{id}")
-    public ResponseEntity<Patient> getPatient(@PathVariable Long id){
+    public ResponseEntity<PatientResponse> getPatient(@PathVariable Long id){
         var patient = patientService.getPatientById(id);
 
         if(patient.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(patient.get());
+        return ResponseEntity.ok(patient.get().toPatientResponse());
     }
 
-    @PostMapping
-    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient){
-        Patient createdPatient = patientService.createPatient(patient);
-        return ResponseEntity.ok(createdPatient);
-    }
+    @PreAuthorize("hasRole('PATIENT')")
+    @GetMapping("/me")
+    public ResponseEntity<PatientResponse> getMyPatientInformation(
+            Authentication authentication){
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<Patient> getPatientByUserId(@PathVariable Long userId){
-        var patient = patientService.getPatientById(userId);
+        var user = userRepository.findByEmail(authentication.getName());
+
+        if(user.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        var patient = patientService.getPatientById(user.get().getId());
 
         if(patient.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(patient.get()); //does this return the entire patient because you should not return the password
+        return ResponseEntity.ok(patient.get().toPatientResponse());
+    }
+
+    @PreAuthorize("hasRole('STAFF')")
+    @GetMapping("/staff/{id}")
+    public ResponseEntity<PatientNameResponse> getPatientName(@PathVariable Long id){
+        var patient = patientService.getPatientById(id);
+
+        if(patient.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(
+                new PatientNameResponse(patient.get().getFullName())
+        );
     }
 }

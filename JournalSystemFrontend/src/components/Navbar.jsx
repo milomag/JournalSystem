@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
@@ -17,6 +18,7 @@ function Navbar({ user, setUser }){
             <div className="navbar-links">
                 <Link to="/">Home</Link>
                 <Link to="/patients">Patient Info</Link>
+                {user && <Link to="/contacts">Contacts</Link>}
 
                 {user ? (
                     <button onClick={handleLogout}>Logout</button>
