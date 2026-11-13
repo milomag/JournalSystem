@@ -2,8 +2,10 @@ package com.journalsystem.backend.entity;
 
 import com.journalsystem.backend.dto.response.UserResponse;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "staff")
 public class Staff extends User{
 
     public Staff() {}
