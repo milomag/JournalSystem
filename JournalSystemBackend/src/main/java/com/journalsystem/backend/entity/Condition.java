@@ -1,5 +1,6 @@
 package com.journalsystem.backend.entity;
 
+import com.journalsystem.backend.dto.response.ConditionResponse;
 import com.journalsystem.backend.entity.compositIds.ConditionId;
 import jakarta.persistence.*;
 
@@ -32,4 +33,8 @@ public class Condition {
     public String getDetails() {return details;}
 
     public Patient getPatient() {return patient;}
+
+    public ConditionResponse toConditionResponse() {
+        return new ConditionResponse(getDiagnosis(), details);
+    }
 }

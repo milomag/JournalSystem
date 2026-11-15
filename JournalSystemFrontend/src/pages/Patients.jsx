@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
+import {Link} from "react-router-dom";
+import AddCondition from "../components/AddCondition.jsx";
+import ListConditions from "../components/ListConditions.jsx";
 
 function Patients({ user }){
     const [patientId, setPatientId] = useState("");
     const [patient, setPatient] = useState(null);
     const [error, setError] = useState("");
+    const [showConditions, setShowConditions] = useState(false);
+    const [showAddCondition, setShowAddCondition] = useState(false);
 
     const isPatient = user.role === "PATIENT";
     const isStaff = user.role === "STAFF";
@@ -30,6 +35,9 @@ function Patients({ user }){
             const data = await response.json();
             setPatient(data);
             setError("");
+
+            setShowConditions(false);
+            setShowAddCondition(false);
         }
         catch(error){
             setPatient(null);
@@ -82,6 +90,11 @@ function Patients({ user }){
         };
     }, [isPatient]);
 
+    useEffect(() => {
+        setShowConditions(false);
+        setShowAddCondition(false);
+    }, [patientId]);
+
     async function searchPatient(){
         if(!patientId){
             setError("Please enter a patient ID.");
@@ -94,6 +107,17 @@ function Patients({ user }){
             : `/api/patients/${patientId}`;
 
         fetchPatient(url);
+    }
+
+    async function showCon() {
+        setShowConditions(true);
+    }
+
+    async function showAddCon() {
+        setShowAddCondition(true);
+    }
+    async function hideAddCon() {
+        setShowAddCondition(false);
     }
 
     return(
@@ -125,6 +149,23 @@ function Patients({ user }){
                             <p>Email: {patient.email}</p>
                             <p>Phone: {patient.phoneNumber}</p>
                             <p>Date of birth: {patient.dateOfBirth}</p>
+
+                            {!showConditions ? (<button onClick={showCon}>Show Conditions</button>):null}
+                            {showConditions ? (
+                                <div>
+                                    <button onClick={showAddCon}>Add condition</button>
+                                    {showAddCondition ? (
+                                        <div>
+                                            <AddCondition id={patient.id}/>
+                                            <button onClick={hideAddCon}>close</button>
+                                        </div>
+                                    ): null}
+                                    <ListConditions
+                                        searchId={patient.id}
+                                        role={user.role}
+                                    />
+                                </div>
+                            ):null}
                         </>
                     ) : null}
                 </div>
