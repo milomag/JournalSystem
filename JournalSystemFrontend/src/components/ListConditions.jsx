@@ -1,17 +1,18 @@
+
 import { useEffect, useState } from "react";
 
-function ListConditions(user) {
+function ListConditions({ searchId, role }) {
+    const patientId = searchId;
 
-    const [patientId, setPatientId] = useState(user.searchId);
+    const isPatient = role === "PATIENT";
+
     const [conditions, setConditions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const isPatient = user.role === "PATIENT";
-    const isStaff = user.role === "STAFF";
-
     async function fetchConditions(url) {
         setLoading(true);
+        setError("");
 
         try {
             const token = localStorage.getItem("token");
@@ -22,81 +23,79 @@ function ListConditions(user) {
                 }
             });
 
-            if(!response.ok){
+            if(!response.ok) {
                 throw new Error(`Could not load conditions (${response.status})`);
             }
 
             const data = await response.json();
-            if (data == null){
-                setConditions([]);
-            } else {
-                setConditions(data);
-            }
+            setConditions(data ?? []);
 
-        }catch(error){
+        } catch(error) {
             setConditions([]);
             setError(error.message);
-        }finally{
+        } finally {
             setLoading(false);
         }
-
     }
 
-    async function searchConditions(){
-        if (!patientId) {
+    async function refreshConditions(){
+        if(!isPatient && !patientId){
             setError("Undefined patient ID.");
             setConditions([]);
             return;
         }
 
-        let url;
-        if (isPatient) {
-            url = `/api/condition/me`;
-        } else if (isStaff){
-            url = `/api/condition/staff/${patientId}`
-        } else {
-            url = `/api/condition/${patientId}`
-        }
+        const url = isPatient
+            ? "/api/condition/me"
+            : `/api/condition/${patientId}`;
 
         await fetchConditions(url);
     }
 
     useEffect(() => {
-        let ignore = false;
+        async function loadConditions(){
+            if(!isPatient && !patientId){
+                setError("Undefined patient ID.");
+                setConditions([]);
+                return;
+            }
 
-        if (!ignore)searchConditions();
-        return ()=>{
-            ignore = true;
-        };
-    },[patientId]);
+            const url = isPatient
+                ? "/api/condition/me"
+                : `/api/condition/${patientId}`;
+
+            await fetchConditions(url);
+        }
+
+        loadConditions();
+    }, [patientId, role]);
 
     return (
         <div>
             <h2>Conditions</h2>
-            <button onClick={searchConditions}>
-                Refresh
+
+            <button onClick={refreshConditions} disabled={loading}>
+                {loading ? "Loading..." : "Refresh"}
             </button>
 
             {error && <p>{error}</p>}
 
-            <div>
-                {conditions.length === 0 ? (
-                    <p>No conditions to show</p>
-                ) : (
-                    <div>
-                        {conditions.map(condition => {
-                            return (
-                                    <div>
-                                        <p>Diagnosis: {condition.diagnosis}</p>
-                                        <small>Details: {condition.details}</small>
-                                    </div>
-                                );
-                        })}
-                    </div>
-                )}
-            </div>
+            {loading ? (
+                <p>Loading conditions...</p>
+            ) : conditions.length === 0 ? (
+                <p>No conditions to show</p>
+            ) : (
+                <div>
+                    {conditions.map(condition => (
+                        <div key={condition.id}>
+                            <p>Diagnosis: {condition.diagnosis}</p>
+                            <small>Details: {condition.details}</small>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
 export default ListConditions;

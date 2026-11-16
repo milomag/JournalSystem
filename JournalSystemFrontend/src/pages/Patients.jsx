@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import {Link} from "react-router-dom";
 import AddCondition from "../components/AddCondition.jsx";
 import ListConditions from "../components/ListConditions.jsx";
 import AddEncounter from "../components/AddEncounter.jsx";
@@ -94,11 +93,6 @@ function Patients({ user }){
         };
     }, [isPatient]);
 
-    useEffect(() => {
-        setShowConditions(false);
-        setShowAddCondition(false);
-    }, [patientId]);
-
     async function searchPatient(){
         if(!patientId){
             setError("Please enter a patient ID.");
@@ -106,11 +100,16 @@ function Patients({ user }){
             return;
         }
 
+        setShowConditions(false);
+        setShowAddCondition(false);
+        setShowEncounters(false);
+        setShowAddEncounters(false);
+
         const url = isStaff
             ? `/api/patients/staff/${patientId}`
             : `/api/patients/${patientId}`;
 
-        fetchPatient(url);
+        await fetchPatient(url);
     }
 
     async function showCon() {

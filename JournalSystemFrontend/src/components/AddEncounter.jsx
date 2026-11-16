@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-function AddEncounter(patient) {
-    const [userId, setUserId] = useState(patient.id);
+function AddEncounter({ id }) {
+    const userId = id;
 
     const [observations, setObservations] = useState([]);
     const [observation, setObservation] = useState("");
@@ -13,25 +13,20 @@ function AddEncounter(patient) {
 
     const token = localStorage.getItem("token");
 
-    const isStaff = patient.userRole === "STAFF";
-
     async function handleSubmit(event) {
         event.preventDefault();
 
-        if(practitionerEmail.trim()==="" || time.trim()==="" || sending) {
+        if(practitionerEmail.trim() === "" || time.trim() === "" || sending) {
             return;
         }
 
-        const body = {practitionerEmail, time, location, observations}
+        const body = { practitionerEmail, time, location, observations };
 
         try {
             setSending(true);
             setMessage("");
 
-            let url = `/api/encounter/${userId}`;
-            if (isStaff) url = `/api/encounter/staff/${userId}`
-
-            const response = await fetch(url, {
+            const response = await fetch(`/api/encounter/${userId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,13 +36,14 @@ function AddEncounter(patient) {
             });
 
             if (!response.ok) {
-                throw new Error(`Could not submit encounter (${response.status})`)
+                throw new Error(`Could not submit encounter (${response.status})`);
             }
 
             setMessage("Successfully added encounter");
             setPractitionerEmail("");
             setTime("");
             setLocation("");
+            setObservations([]);
             setObservation("");
 
         } catch (error) {
@@ -60,7 +56,7 @@ function AddEncounter(patient) {
     async function addObservation(event) {
         event.preventDefault();
         if (observation.trim() === "") return;
-        observations.push(observation);
+        setObservations(prev => [...prev, observation]);
         setObservation("");
     }
 

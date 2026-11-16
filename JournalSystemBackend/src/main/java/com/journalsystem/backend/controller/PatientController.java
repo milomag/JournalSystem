@@ -39,16 +39,18 @@ public class PatientController{
 
     @PreAuthorize("hasRole('PATIENT')")
     @GetMapping("/me")
-    public ResponseEntity<PatientResponse> getMyPatientInformation( //Man bör väl kunna söka direct på patient?
+    public ResponseEntity<PatientResponse> getMyPatientInformation(
             Authentication authentication){
 
-        var user = userRepository.findByEmail(authentication.getName());
+        /*var user = userRepository.findByEmail(authentication.getName());
 
         if(user.isEmpty()){
             return ResponseEntity.notFound().build();
         }
 
-        var patient = patientService.getPatientById(user.get().getId());
+        var patient = patientService.getPatientById(user.get().getId());*/
+
+        var patient = patientService.getPatientByEmail(authentication.getName());
 
         if(patient.isEmpty()){
             return ResponseEntity.notFound().build();

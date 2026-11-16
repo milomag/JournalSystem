@@ -1,14 +1,14 @@
+
 import { useEffect, useState } from "react";
 
-function ListEncounters(user) {
+function ListEncounters({ searchId, role }) {
+    const patientId = searchId;
 
-    const [patientId, setPatientId] = useState(user.searchId);
+    const isPatient = role === "PATIENT";
+
     const [encounters, setEncounters] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
-    const isPatient = user.role === "PATIENT";
-    const isStaff = user.role === "STAFF";
 
     async function fetchEncounters(url) {
         setLoading(true);
@@ -23,84 +23,87 @@ function ListEncounters(user) {
                 }
             });
 
-            if(!response.ok){
+            if(!response.ok) {
                 throw new Error(`Could not load encounters (${response.status})`);
             }
 
             const data = await response.json();
-            if (data == null){
-                setEncounters([]);
-            } else {
-                setEncounters(data);
-            }
+            setEncounters(data ?? []);
 
-        }catch(error){
+        } catch(error) {
             setEncounters([]);
             setError(error.message);
-        }finally{
+        } finally {
             setLoading(false);
         }
-
     }
 
-    async function searchEncounters(){
-        if (!patientId) {
+    async function refreshEncounters(){
+        if(!isPatient && !patientId){
             setError("Undefined patient ID.");
             setEncounters([]);
             return;
         }
-        let url;
-        if (isPatient) {
-            url = `/api/encounter/me`;
-        } else if (isStaff){
-            url = `/api/encounter/staff/${patientId}`
-        } else {
-            url = `/api/encounter/${patientId}`
-        }
+
+        const url = isPatient
+            ? "/api/encounter/me"
+            : `/api/encounter/${patientId}`;
 
         await fetchEncounters(url);
     }
 
     useEffect(() => {
-        let ignore = false;
+        async function loadEncounters(){
+            if(!isPatient && !patientId){
+                setError("Undefined patient ID.");
+                setEncounters([]);
+                return;
+            }
 
-        if (!ignore)searchEncounters();
-        return ()=>{
-            ignore = true;
-        };
-    },[patientId]);
+            const url = isPatient
+                ? "/api/encounter/me"
+                : `/api/encounter/${patientId}`;
+
+            await fetchEncounters(url);
+        }
+
+        loadEncounters();
+    }, [patientId, role]);
 
     return (
         <div>
             <h2>Encounters</h2>
-            <button onClick={searchEncounters}>
-                Refresh
+
+            <button onClick={refreshEncounters} disabled={loading}>
+                {loading ? "Loading..." : "Refresh"}
             </button>
 
             {error && <p>{error}</p>}
 
-            <div>
-                {encounters.length === 0 ? (
-                    <p>No encounters to show</p>
-                ) : (
-                    <div>
-                        {encounters.map(encounter => {
-                            return (
-                                <div>
-                                    <p>{encounter.practitionerEmail} : {encounter.time} : {encounter.location}</p>
-                                    {encounter.observations.map(observation => {
-                                        return (
-                                            <small>{observation}<br/></small>
-                                        )
-                                    })}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
-            </div>
+            {loading ? (
+                <p>Loading encounters...</p>
+            ) : encounters.length === 0 ? (
+                <p>No encounters to show</p>
+            ) : (
+                <div>
+                    {encounters.map(encounter => (
+                        <div key={encounter.id}>
+                            <p>
+                                {encounter.practitionerEmail} : {encounter.time} : {encounter.location}
+                            </p>
+
+                            {encounter.observations?.map((observation, index) => (
+                                <small key={index}>
+                                    {observation}
+                                    <br />
+                                </small>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
-    )
+    );
 }
 
 export default ListEncounters;

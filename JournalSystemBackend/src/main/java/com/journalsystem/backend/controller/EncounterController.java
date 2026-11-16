@@ -24,7 +24,7 @@ public class EncounterController {
         this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'STAFF')")
     @PostMapping("/{patientId}")
     public ResponseEntity<EncounterResponse> addEncounter(
             @PathVariable Long patientId,
@@ -38,37 +38,9 @@ public class EncounterController {
         }
     }
 
-    @PreAuthorize("hasRole('DOCTOR')")
+    @PreAuthorize("hasAnyRole('DOCTOR', 'STAFF')")
     @GetMapping("/{patientId}")
     public ResponseEntity<List<EncounterResponse>> getEncounter(
-            @PathVariable Long patientId) {
-
-        List<EncounterResponse> encounters = encounterService.getEncounters(patientId);
-
-        if(encounters.isEmpty()){
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(encounters);
-    }
-
-    @PreAuthorize("hasRole('STAFF')")
-    @PostMapping("/staff/{patientId}")
-    public ResponseEntity<EncounterResponse> addEncounterStaff(
-            @PathVariable Long patientId,
-            @Valid @RequestBody EncounterRequest request) {
-
-        try {
-            EncounterResponse response = encounterService.createEncounter(request, patientId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    @PreAuthorize("hasRole('STAFF')")
-    @GetMapping("/staff/{patientId}")
-    public ResponseEntity<List<EncounterResponse>> getEncounterStaff(
             @PathVariable Long patientId) {
 
         List<EncounterResponse> encounters = encounterService.getEncounters(patientId);

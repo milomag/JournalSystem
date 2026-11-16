@@ -23,5 +23,9 @@ public class PatientService{
         return iPatientRepository.save(patient);
     }
 
+    public Optional<Patient> getPatientByEmail(String email) {
+        return iPatientRepository.findByEmail(email);
+    }
+
     public boolean existsByEmail(String email) { return iPatientRepository.existsByEmail(email); }
 }
