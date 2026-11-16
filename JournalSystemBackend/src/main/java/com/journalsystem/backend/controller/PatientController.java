@@ -67,7 +67,7 @@ public class PatientController{
         }
 
         return ResponseEntity.ok(
-                new PatientNameResponse(patient.get().getFullName())
+                new PatientNameResponse(patient.get().getId(), patient.get().getFullName())
         );
     }
 }

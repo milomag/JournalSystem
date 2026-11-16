@@ -10,10 +10,12 @@ function AddCondition(patient) {
 
     const token = localStorage.getItem("token");
 
+    const isStaff = patient.userRole === "STAFF";
+
     async function handleSubmit(event) {
         event.preventDefault();
 
-        if(!diagnosis.trim() || sending) {
+        if(diagnosis.trim()==="" || sending) {
             return;
         }
 
@@ -23,9 +25,10 @@ function AddCondition(patient) {
             setSending(true);
             setMessage("");
 
-            console.log(userId);
+            let url = `/api/condition/${userId}`
+            if (isStaff) url = `/api/condition/staff/${userId}`
 
-            const response = await fetch(`/api/condition/${userId}`, {
+            const response = await fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

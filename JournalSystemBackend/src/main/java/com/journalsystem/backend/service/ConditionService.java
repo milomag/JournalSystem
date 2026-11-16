@@ -40,6 +40,7 @@ public class ConditionService {
         return savedCondition.toConditionResponse();
     }
 
+
     public List<ConditionResponse> getConditions(Long patientId) {
         Patient patient = patientService.getPatientById(patientId)
                 .orElseThrow(() -> new ResponseStatusException(

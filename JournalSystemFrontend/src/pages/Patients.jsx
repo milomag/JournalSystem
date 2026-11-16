@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import {Link} from "react-router-dom";
 import AddCondition from "../components/AddCondition.jsx";
 import ListConditions from "../components/ListConditions.jsx";
+import AddEncounter from "../components/AddEncounter.jsx";
+import ListEncounters from "../components/ListEncounters.jsx";
 
 function Patients({ user }){
     const [patientId, setPatientId] = useState("");
@@ -9,6 +11,8 @@ function Patients({ user }){
     const [error, setError] = useState("");
     const [showConditions, setShowConditions] = useState(false);
     const [showAddCondition, setShowAddCondition] = useState(false);
+    const [showEncounters, setShowEncounters] = useState(false);
+    const [showAddEncounters, setShowAddEncounters] = useState(false);
 
     const isPatient = user.role === "PATIENT";
     const isStaff = user.role === "STAFF";
@@ -111,6 +115,8 @@ function Patients({ user }){
 
     async function showCon() {
         setShowConditions(true);
+        setShowEncounters(false);
+        setShowAddEncounters(false);
     }
 
     async function showAddCon() {
@@ -118,6 +124,19 @@ function Patients({ user }){
     }
     async function hideAddCon() {
         setShowAddCondition(false);
+    }
+
+    async function showEnc() {
+        setShowEncounters(true);
+        setShowConditions(false);
+        setShowAddCondition(false);
+    }
+
+    async function showAddEnc() {
+        setShowAddEncounters(true);
+    }
+    async function hideAddEnc() {
+        setShowAddEncounters(false);
     }
 
     return(
@@ -150,24 +169,51 @@ function Patients({ user }){
                             <p>Phone: {patient.phoneNumber}</p>
                             <p>Date of birth: {patient.dateOfBirth}</p>
 
-                            {!showConditions ? (<button onClick={showCon}>Show Conditions</button>):null}
-                            {showConditions ? (
-                                <div>
-                                    <button onClick={showAddCon}>Add condition</button>
-                                    {showAddCondition ? (
-                                        <div>
-                                            <AddCondition id={patient.id}/>
-                                            <button onClick={hideAddCon}>close</button>
-                                        </div>
-                                    ): null}
-                                    <ListConditions
-                                        searchId={patient.id}
-                                        role={user.role}
-                                    />
-                                </div>
-                            ):null}
+
+
                         </>
                     ) : null}
+
+                    {!showConditions ? (<button onClick={showCon}>Show Conditions</button>):null}
+                    {!showEncounters ? (<button onClick={showEnc}>Show Encounters</button>):null}
+
+                    {showConditions ? (
+                        <div>
+                            {!isPatient ? (<button onClick={showAddCon}>Add condition</button>):null}
+                            {showAddCondition ? (
+                                <div>
+                                    <AddCondition
+                                        id={patient.id}
+                                        userRole={user.role}
+                                    />
+                                    <button onClick={hideAddCon}>close</button>
+                                </div>
+                            ): null}
+                            <ListConditions
+                                searchId={patient.id}
+                                role={user.role}
+                            />
+                        </div>
+                    ):null}
+
+                    {showEncounters ? (
+                        <div>
+                            {!isPatient ? (<button onClick={showAddEnc}>Add encounters</button>):null}
+                            {showAddEncounters ? (
+                                <div>
+                                    <AddEncounter
+                                        id={patient.id}
+                                        userRole={user.role}
+                                    />
+                                    <button onClick={hideAddEnc}>close</button>
+                                </div>
+                            ): null}
+                            <ListEncounters
+                                searchId={patient.id}
+                                role={user.role}
+                            />
+                        </div>
+                    ):null}
                 </div>
             )}
         </div>

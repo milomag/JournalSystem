@@ -8,6 +8,7 @@ function ListConditions(user) {
     const [error, setError] = useState("");
 
     const isPatient = user.role === "PATIENT";
+    const isStaff = user.role === "STAFF";
 
     async function fetchConditions(url) {
         setLoading(true);
@@ -48,9 +49,14 @@ function ListConditions(user) {
             return;
         }
 
-        const url = isPatient
-            ? `/api/condition/me`
-            : `/api/condition/${patientId}`;
+        let url;
+        if (isPatient) {
+            url = `/api/condition/me`;
+        } else if (isStaff){
+            url = `/api/condition/staff/${patientId}`
+        } else {
+            url = `/api/condition/${patientId}`
+        }
 
         await fetchConditions(url);
     }

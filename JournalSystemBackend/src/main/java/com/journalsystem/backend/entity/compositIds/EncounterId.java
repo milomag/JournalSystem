@@ -12,7 +12,7 @@ import java.util.Objects;
 @Embeddable
 public class EncounterId implements Serializable {
     @NotNull
-    private Timestamp dateAndTime;
+    private String dateAndTime;
 
     private Long patientId;
 
@@ -20,13 +20,13 @@ public class EncounterId implements Serializable {
 
     public EncounterId() {}
 
-    public EncounterId(Timestamp dateAndTime, Patient patient, Practitioner practitioner) {
+    public EncounterId(String dateAndTime, Patient patient, Practitioner practitioner) {
         this.dateAndTime = dateAndTime;
         patientId = patient.getId();
         practitionerId = practitioner.getId();
     }
 
-    public Timestamp getDateAndTime() {return dateAndTime;}
+    public String getDateAndTime() {return dateAndTime;}
 
     public Long getPatientId() {return patientId;}
 

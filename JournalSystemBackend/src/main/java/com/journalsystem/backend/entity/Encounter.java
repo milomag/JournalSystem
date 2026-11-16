@@ -23,14 +23,11 @@ public class Encounter {
     @JoinColumn(name = "practitioner_id")
     private Practitioner practitioner;
 
-    @ManyToOne
-    @JoinColumn(name = "locations_address")
-    @NotNull
-    private Location location;
+    private String location;
 
     public Encounter() {}
 
-    public Encounter(Timestamp dateAndTime, Patient patient, Practitioner practitioner, Location location) {
+    public Encounter(String dateAndTime, Patient patient, Practitioner practitioner, String location) {
         encounterId = new EncounterId(dateAndTime, patient, practitioner);
         this.patient = patient;
         this.practitioner = practitioner;
@@ -39,11 +36,11 @@ public class Encounter {
 
     public EncounterId getEncounterId() {return encounterId;}
 
-    public Timestamp getDateAndTime() {return encounterId.getDateAndTime();}
+    public String getDateAndTime() {return encounterId.getDateAndTime();}
 
     public Patient getPatient() {return patient;}
 
     public Practitioner getPractitioner() {return practitioner;}
 
-    public Location getLocation() {return location;}
+    public String getLocation() {return location;}
 }
